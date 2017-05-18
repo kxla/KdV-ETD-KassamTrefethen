@@ -1,2 +1,2 @@
 # KdV-ETD-KassamTrefethen
-Exponential time differencing method given by Kassam & Trefethen (2005)
+Exponential time differencing method for solving the KdV equation given by Kassam & Trefethen (2005)
