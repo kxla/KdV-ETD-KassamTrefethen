@@ -17,9 +17,9 @@ u_hat = fft(u);
 % Precompute various ETDRK4 scalar quantities:
 h = 1/4; % time step
 k = [0:N/2 -N/2+1:-1]'*(pi/Left); % wave numbers
-alpha = 1;
-epsilon = 1;
-F = 1;
+alpha = 1; % nonlinear term
+epsilon = 1; % dispersive term
+F = 1; % Froude number
 L = -1i*(k.^3).*(epsilon/6)-1i*k*(F-1); % linear operator
 E = exp(h*L); E2 = exp(h*L/2);
 M = 16; % no. of points for complex means
