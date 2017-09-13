@@ -1,21 +1,27 @@
-% KT-ETDRK4.m - exponential time differencing method for solving the KdV equation given 
-% by Kassam & Trefethen (2005) using ETDRK4 scheme 
+% KT_ETDRK4.m
+%
+% Exponential time differencing method for solving the KdV equation given
+% by Kassam & Trefethen (2005) using ETDRK4 scheme
+%
+% Uses numerical solution if input is 'numerical'
+% Uses exact solution if input is 'exact'
 %
 % u_t = (1/6) * epsilon * u_xxx - (F-1) * u_x + (3/2) * alpha * u * u_x
 
-% Spatial grid and initial condition:
+
+function soln = KT_ETDRK4(input, h, N)
+
+% Spatial grid:
 nplots = 50;
-N = 128;
+%N = 128;
 Left = 50;
 dx = 2*Left/N;
 nu = 1;
 xi = 0.5;
 x = ((dx-Left):dx:Left)';
-% u = nu*sech(xi*x).^2;
-% u_hat = fft(u);
 
 % Precompute various ETDRK4 scalar quantities:
-h = 1/4; % time step
+%h = 1/4; % time step
 k = [0:N/2 -N/2+1:-1]'*(pi/Left); % wave numbers
 alpha = 1;
 epsilon = 1;
@@ -30,13 +36,19 @@ f1 = h*real(mean( (-4-LR+exp(LR).*(4-3*LR+LR.^2))./LR.^3 ,2));
 f2 = h*real(mean( (2+LR+exp(LR).*(-2+LR))./LR.^3 ,2));
 f3 = h*real(mean( (-4-3*LR-LR.^2+exp(LR).*(4-LR))./LR.^3 ,2));
 
-% Initial condition
-aa = 1;
-t = 0;
-U = F - 1 - (1/2)*alpha*aa;
-u = aa * sech( (((-3/2)*alpha*aa/(-2*epsilon))^(1/2)) * (x-U*t) ).^2; % exact solution
-% u = 0.*x;
+% Numerical or exact solution
+if (strcmp(input,'numerical'))
+    u = nu*sech(xi*x).^2;           % numerical solution
+    sprintf('numerical')
+elseif (strcmp(input,'exact'))
+    aa = 1;
+    t = 0;
+    U = F - 1 - (1/2)*alpha*aa;
+    u = aa * sech( (((-3/2)*alpha*aa/(-2*epsilon))^(1/2)) * (x-U*t) ).^2; % exact solution
+    sprintf('exact')
+end
 u_hat = fft(u);
+
 
 % Main time-stepping loop:
 tmax = 150; nmax = round(tmax/h); nplt = floor((tmax/100)/h)*2;
@@ -66,3 +78,6 @@ waterfall(x,tdata,real(uu)), view(0,70),
 xlim([-Left,Left]);
 ylim([0,tmax]);
 grid off
+
+% Solution
+soln = u;
