@@ -39,13 +39,11 @@ f3 = h*real(mean( (-4-3*LR-LR.^2+exp(LR).*(4-LR))./LR.^3 ,2));
 % Numerical or exact solution
 if (strcmp(input,'numerical'))
     u = nu*sech(xi*x).^2;           % numerical solution
-    sprintf('numerical')
 elseif (strcmp(input,'exact'))
     aa = 1;
     t = 0;
     U = F - 1 - (1/2)*alpha*aa;
     u = aa * sech( (((-3/2)*alpha*aa/(-2*epsilon))^(1/2)) * (x-U*t) ).^2; % exact solution
-    sprintf('exact')
 end
 u_hat = fft(u);
 

@@ -11,19 +11,22 @@ close all
 
 h_values = [1/4 10e-2 10e-3 10e-4];
 N_values = [128 256];
-u_exact = zeros(size(h_values,2),size(N_values,2));
-u_numerical = zeros(size(h_values,2),size(N_values,2));
+%u_exact = zeros(size(h_values,2),size(N_values,2),N);
+%u_numerical = zeros(size(h_values,2),size(N_values,2),N);
+infnorm = zeros(size(h_values,2),size(N_values,2));
 
 for index1 = 1:size(h_values,2)
     for index2 = 1:size(N_values,2)
         h = h_values(index1);
         N = N_values(index2);
-        u_exact(index1,index2) = KT_ETDRK4('exact',h,N);           % Exact solution
-        u_numerical(index1,index2) = KT_ETDRK4('numerical',h,N);   % Numerical solution
+        u_exact = KT_ETDRK4('exact',h,N);           % Exact solution
+        u_numerical = KT_ETDRK4('numerical',h,N);   % Numerical solution
+        infnorm(index1,index2) = norm(u_exact - u_numerical);
         clc
         close all
+        clear u_exact u_numerical
     end
 end
 
 % Infinity-norm of (u_exact - u_numerical)
-infnorm = norm(u_exact - u_numerical,Inf);
+%infnorm = norm(u_exact - u_numerical,Inf);
