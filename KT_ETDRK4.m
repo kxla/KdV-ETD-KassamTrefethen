@@ -9,7 +9,7 @@
 % u_t = (1/6) * epsilon * u_xxx - (F-1) * u_x + (3/2) * alpha * u * u_x
 
 
-function soln = KT_ETDRK4(input, h, N)
+function [u_numerical, u_exact] = KT_ETDRK4(h, N)
 
 % Spatial grid:
 nplots = 50;
@@ -36,21 +36,19 @@ f1 = h*real(mean( (-4-LR+exp(LR).*(4-3*LR+LR.^2))./LR.^3 ,2));
 f2 = h*real(mean( (2+LR+exp(LR).*(-2+LR))./LR.^3 ,2));
 f3 = h*real(mean( (-4-3*LR-LR.^2+exp(LR).*(4-LR))./LR.^3 ,2));
 
-% Numerical or exact solution
-if (strcmp(input,'numerical'))
-    u = nu*sech(xi*x).^2;           % numerical solution
-elseif (strcmp(input,'exact'))
-    aa = 1;
-    t = 0;
-    U = F - 1 - (1/2)*alpha*aa;
-    u = aa * sech( (((-3/2)*alpha*aa/(-2*epsilon))^(1/2)) * (x-U*t) ).^2; % exact solution
-end
-u_hat = fft(u);
-
+aa = 1;
+t = 0;
+U = F - 1 - (1/2)*alpha*aa;
 
 % Main time-stepping loop:
 tmax = 150; nmax = round(tmax/h); nplt = floor((tmax/100)/h)*2;
 uu = zeros(nmax/nplt,N);
+
+u_exact = zeros(nplt+1,N);
+u_exact(1,:) = aa * sech( (((-3/2)*alpha*aa/(-2*epsilon))^(1/2)) * (x-U*t) ).^2; % exact solution
+u = u_exact(1,:)';
+u_hat = fft(u);
+
 % tdata = h:h:tmax;
 tdata = linspace(h,tmax,50);
 g = 1i*k*(3/4)*alpha; % nonlinear operator
@@ -67,15 +65,25 @@ for n = 1:nmax
   if mod(n,nplt)==0
     u = real(ifft(u_hat));
     uu((n/nplt),:) = u;
+    u_exact(nplt+1,:) = aa * sech( (((-3/2)*alpha*aa/(-2*epsilon))^(1/2)) * (x-U*t) ).^2;
   end
 end
 
+
+figTitle = ['h = ',num2str(h),' , N = ',num2str(N)];
+figure('Name', figTitle)
+
 % Plot results:
-figure
+subplot(2,1,1)
 waterfall(x,tdata,real(uu)), view(0,70),
 xlim([-Left,Left]);
 ylim([0,tmax]);
+title('Results');
 grid off
 
-% Solution
-soln = u;
+% Plot solution
+u_numerical = u;
+u_exact = u;
+subplot(2,1,2)
+plot(x,u,x,u_exact)
+title('Solution');
