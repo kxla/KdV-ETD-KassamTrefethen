@@ -36,7 +36,7 @@ f1 = h*real(mean( (-4-LR+exp(LR).*(4-3*LR+LR.^2))./LR.^3 ,2));
 f2 = h*real(mean( (2+LR+exp(LR).*(-2+LR))./LR.^3 ,2));
 f3 = h*real(mean( (-4-3*LR-LR.^2+exp(LR).*(4-LR))./LR.^3 ,2));
 
-aa = 1;
+aa = .5;
 t = 0;
 U = F - 1 - (1/2)*alpha*aa;
 
@@ -44,7 +44,7 @@ U = F - 1 - (1/2)*alpha*aa;
 tmax = 150; nmax = round(tmax/h); nplt = floor((tmax/100)/h)*2;
 uu = zeros(nmax/nplt,N);
 
-u_exact = zeros(nplt+1,N);
+u_exact = zeros(nmax/nplt,N);
 u_exact(1,:) = aa * sech( (((-3/2)*alpha*aa/(-2*epsilon))^(1/2)) * (x-U*t) ).^2; % exact solution
 u = u_exact(1,:)';
 u_hat = fft(u);
@@ -65,7 +65,7 @@ for n = 1:nmax
   if mod(n,nplt)==0
     u = real(ifft(u_hat));
     uu((n/nplt),:) = u;
-    u_exact(nplt+1,:) = aa * sech( (((-3/2)*alpha*aa/(-2*epsilon))^(1/2)) * (x-U*t) ).^2;
+    u_exact(n/nplt,:) = aa * sech( (((-3/2)*alpha*aa/(-2*epsilon))^(1/2)) * (x-U*t) ).^2;
   end
 end
 
@@ -74,16 +74,26 @@ figTitle = ['h = ',num2str(h),' , N = ',num2str(N)];
 figure('Name', figTitle)
 
 % Plot results:
-subplot(2,1,1)
+subplot(3,1,1)
 waterfall(x,tdata,real(uu)), view(0,70),
 xlim([-Left,Left]);
 ylim([0,tmax]);
-title('Results');
+title('Numerical');
 grid off
 
+subplot(3,1,2)
+waterfall(x,tdata,u_exact), view(0,70),
+xlim([-Left,Left]);
+ylim([0,tmax]);
+title('Exact');
+
 % Plot solution
-u_numerical = u;
-u_exact = u;
-subplot(2,1,2)
+u_numerical = uu(nmax/nplt,:);
+u_exact = u_exact(nmax/nplt,:);
+subplot(3,1,3)
 plot(x,u,x,u_exact)
 title('Solution');
+
+
+
+return
